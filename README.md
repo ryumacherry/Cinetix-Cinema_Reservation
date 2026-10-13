@@ -14,10 +14,10 @@ lalu simpan e-ticket ber-barcode. Admin dapat mengelola data dan melihat laporan
 ## Arsitektur
 
 ```
-┌────────────────────┐   HTTP/JSON     ┌────────────────────────── ─┐   JDBC   ┌──────────┐
+┌────────────────────┐   HTTP/JSON     ┌─────────────────────────────┐   JDBC   ┌──────────┐
 │  Aplikasi Android  │ ─────────────▶ │  Backend API (Kotlin OOP)   │ ───────▶ │ MySQL 8  │
-│  Jetpack Compose   │   (Retrofit)    │  api → service → repository │          │ tiketku  │
-└────────────────────┘                 └─────────────────────────── ┘          └──────────┘
+│  Jetpack Compose   │   (Retrofit)    │ api → service → repository  │          │ tiketku  │
+└────────────────────┘                 └─────────────────────────────┘          └──────────┘
 ```
 
 Aplikasi Android **tidak** terhubung langsung ke MySQL (tidak aman dan driver JDBC tidak cocok untuk Android).
