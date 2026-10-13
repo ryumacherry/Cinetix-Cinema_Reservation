@@ -141,9 +141,9 @@ Diagram lengkap: [`docs/02-class-diagram.md`](docs/02-class-diagram.md).
 ## Tim
 | Nama | NIM | Peran |
 |---|---|---|
-| ... | ... | Project Lead |
-| ... | ... | Domain Developer |
-| ... | ... | Business Logic |
-| ... | ... | UI (Android) |
-| ... | ... | QA + Data |
-| ... | ... | DevOps |
+| Qurrata A'yuni | 225443023 | Project Lead |
+| Ajeng Az Zahra | 225443002 | Domain Developer |
+| Arlisya Rahwitami | 225443004 | Business Logic |
+| Shiva Nayla Zahra | 225443053 | UI (Android) |
+| Renisa Rahmawati | 225443025 | QA + Data |
+| Nabila Khalishah | 225443021 | DevOps |
