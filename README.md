@@ -24,38 +24,58 @@ Rincian kontribusi ada di [CONTRIBUTORS.md](CONTRIBUTORS.md).
 - [x] Lihat bioskop per kota
 - [x] Film Sedang Tayang & Coming Soon + detail film
 - [x] Pilih hari (maks. 3 hari), lokasi, jam, dan studio
-- [x] Pilih kursi (anti double booking)
+- [x] Pilih kursi (dari denah studio (dibagi seksi dekat/jauh layar dan dua sisi dengan jalan tengah, anti double booking)
 - [x] Bayar QRIS (QR otomatis sesuai nominal) / Transfer Bank (VA) / Kartu Kredit
-- [x] Cashback
+- [x] diskon beli banyak (Reguler 6% · Premiere 8% · Suites 10% untuk 5 tiket atau lebih) 
 - [x] Riwayat pembelian
 - [x] E-ticket + barcode untuk dicetak
 
 **Admin**
 - [x] CRUD film, kota, cinema, studio, jadwal, harga studio
-- [x] Kelola diskon
 - [x] Laporan penjualan & film terlaris
 
-## Arsitektur
-```mermaid
-flowchart LR
-    A["Aplikasi Android<br/>Jetpack Compose"] -- "HTTP/JSON (Retrofit)" --> B["Backend API Kotlin OOP<br/>api → service → repository"]
-    B -- JDBC --> C[("MySQL 8<br/>tiketku")]
+## Struktur Folder
+```
+cinetix/
+├── backend/                     # REST API Kotlin (JDK HttpServer + JDBC)
+│   ├── src/main/kotlin/
+│   │   ├── model/               # entity + abstract class + interface (OOP)
+│   │   ├── repository/          # akses MySQL (JDBC)
+│   │   ├── service/             # logika bisnis
+│   │   ├── exception/           # custom exception
+│   │   ├── util/                # koneksi DB, QR/barcode, hash password
+│   │   ├── api/                 # router + endpoint REST
+│   │   └── Main.kt
+│   ├── src/test/kotlin/         # unit test (repository palsu, tanpa MySQL)
+│   ├── build.gradle.kts
+│   └── Dockerfile
+├── android/                     # aplikasi Android (Kotlin + Jetpack Compose)
+│   └── app/src/main/java/com/cinetix/app/
+│       ├── data/                # Retrofit, DTO, session
+│       ├── ui/                  # layar: auth, home, booking, tiket, profil, admin
+│       └── util/                # format rupiah, QR/barcode, cetak tiket
+├── data/schema.sql, seed.sql    # skema & data awal MySQL
+├── docs/                        # user story, class diagram, API, pembagian tugas
+├── docker-compose.yml           # MySQL + backend
+└── .github/workflows/ci.yml     # unit test + build APK otomatis
 ```
 
 Aplikasi Android **tidak** terhubung langsung ke MySQL. Semua logika bisnis dan akses database berada di backend.
 
 Diagram lengkap (class diagram & ERD): [docs/02-class-diagram.md](docs/02-class-diagram.md)
 
-### Konsep OOP
+## Konsep OOP
 | Konsep | Penerapan |
 |---|---|
-| Abstract class | `Studio`, `Pembayaran`, `MenuFnb`, `Pengguna` |
-| Inheritance | `Reguler/FourDX/Premiere/Suites`, `Qris/TransferBank/KartuKredit`, `Makanan/Minuman/Bundling`, `Pelanggan/Admin` |
-| Polymorphism | `studio.hargaTiket()`, `pembayaran.biayaAdmin()` & `proses()`, `cashback.hitung()` |
-| Interface | `Cashback`, `Cetakable`, `CrudRepository<T>` |
-| Encapsulation | stok F&B & saldo cashback `private set`; status bayar hanya berubah lewat `bayar()` |
-| Data class | `Film`, `Cinema`, `Jadwal`, `Kursi`, `Tiket` |
-| Custom exception | `KursiSudahDipesanException`, `HariTidakValidException`, `PembayaranGagalException`, `StokHabisException` |
+| Abstract class | `Studio`, `Pembayaran`, `Pengguna` |
+| Inheritance | `Reguler/Premiere/Suites`, `Qris/TransferBank/KartuKredit`, `Pelanggan/Admin` |
+| Polymorphism | `studio.hargaTiket()`, `studio.persenDiskon`, `pembayaran.biayaAdmin()` & `proses()` |
+| Interface | `Cetakable`, `CrudRepository<T>` dan repository lain |
+| Encapsulation | status bayar hanya berubah lewat `bayar()`; `pesananLayanan` Suites `private` |
+| Data class | `Film`, `Cinema`, `Jadwal`, `KursiStudio`, `Kursi`, `Tiket` |
+| Custom exception | `KursiSudahDipesanException`, `HariTidakValidException`, `PembayaranGagalException` |
+
+Diagram lengkap: [`docs/02-class-diagram.md`](docs/02-class-diagram.md).
 
 ## Cara Menjalankan
 
@@ -114,11 +134,18 @@ cd backend
 - JUnit 5
 - Docker, GitHub Actions
 
+## Masalah yang sering terjadi
+| Masalah | Solusi |
+|---|---|
+| Android: "Tidak bisa terhubung ke server" | Backend belum jalan, atau alamat server salah. Emulator: `http://10.0.2.2:8080/`. HP asli: IP laptop + satu Wi-Fi |
+| `Public Key Retrieval is not allowed` | Tambahkan `allowPublicKeyRetrieval=true&useSSL=false` di `DB_URL` |
+| `Connection refused` di Docker | Di dalam container, host database adalah `db`, bukan `localhost` |
+| Seed/schema tidak berubah (mis. tabel `kursi_studio` tidak ada) | Script init MySQL hanya jalan sekali. Jalankan `docker compose down -v` lalu `docker compose up -d --build` |
+| Port 3306 bentrok | MySQL Docker dipetakan ke port host `3307` |
+| Jadwal kosong | Backend mengisi jadwal 3 hari otomatis saat start. Admin juga bisa tekan "Generate 3 hari" |
+
 ## Dokumentasi
 - [User story & requirement](docs/01-user-story.md)
 - [Class diagram, ERD, arsitektur](docs/02-class-diagram.md)
 - [Dokumentasi REST API](docs/03-api.md)
 - [Pembagian tugas & alur 3 hari](docs/04-pembagian-tugas.md)
-
-## Lisensi
-MIT
