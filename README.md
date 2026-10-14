@@ -1,10 +1,10 @@
 # Cinetix — Aplikasi Reservasi Bioskop
 
 ## Deskripsi
-Cinetix adalah aplikasi pemesanan tiket bioskop ala CGV untuk pelanggan yang ingin memesan tiket tanpa antre, dan untuk admin bioskop yang perlu mengelola data serta memantau penjualan. Pelanggan dapat melihat bioskop per kota, film Sedang Tayang & Coming Soon, memilih jadwal (maks. 3 hari ke depan) dan studio (Reguler / 4DX / Premiere / Suites), memilih kursi tanpa risiko double booking, memesan F&B + paket bundling, membayar, mendapat cashback, lalu menyimpan e-ticket ber-barcode.
+Cinetix adalah aplikasi pemesanan tiket bioskop untuk pelanggan yang ingin memesan tiket tanpa antre, dan untuk admin bioskop yang perlu mengelola data serta memantau penjualan. Pelanggan dapat melihat bioskop per kota, film Sedang Tayang & Coming Soon, memilih jadwal (maks. 3 hari ke depan) dan studio (Reguler / Premiere / Suites), memilih kursi tanpa risiko double booking, membayar, mendapat diskon, lalu menyimpan e-ticket ber-barcode.
 
 > ⚠️ **Pembayaran QRIS, transfer bank, dan kartu kredit adalah SIMULASI.**
-> Tidak terhubung ke payment gateway (Midtrans/Xendit). QR berisi nominal dibuat dengan ZXing, lalu pelanggan menekan "Saya sudah bayar" untuk mensimulasikan pembayaran berhasil.
+> Tidak terhubung ke payment gateway. QR berisi nominal dibuat dengan ZXing, lalu pelanggan menekan "Saya sudah bayar" untuk mensimulasikan pembayaran berhasil.
 
 ## Anggota Kelompok
 | Nama | NIM | Peran |
@@ -25,7 +25,6 @@ Rincian kontribusi ada di [CONTRIBUTORS.md](CONTRIBUTORS.md).
 - [x] Film Sedang Tayang & Coming Soon + detail film
 - [x] Pilih hari (maks. 3 hari), lokasi, jam, dan studio
 - [x] Pilih kursi (anti double booking)
-- [x] F&B: Popcorn, Sistagor, Cola, Mineral + bundling
 - [x] Bayar QRIS (QR otomatis sesuai nominal) / Transfer Bank (VA) / Kartu Kredit
 - [x] Cashback
 - [x] Riwayat pembelian
@@ -33,8 +32,7 @@ Rincian kontribusi ada di [CONTRIBUTORS.md](CONTRIBUTORS.md).
 
 **Admin**
 - [x] CRUD film, kota, cinema, studio, jadwal, harga studio
-- [x] CRUD menu F&B & bundling
-- [x] Kelola promo cashback
+- [x] Kelola diskon
 - [x] Laporan penjualan & film terlaris
 
 ## Arsitektur
