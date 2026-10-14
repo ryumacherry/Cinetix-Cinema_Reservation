@@ -37,27 +37,46 @@ Rincian kontribusi ada di [CONTRIBUTORS.md](CONTRIBUTORS.md).
 ## Struktur Folder
 ```
 cinetix/
-├── backend/                     # REST API Kotlin (JDK HttpServer + JDBC)
+├── android/                  ← Aplikasi Android (Kotlin + Jetpack Compose)
+│   └── app/src/main/
+│       ├── AndroidManifest.xml
+│       ├── res/              (ikon, warna, tema, string)
+│       └── java/com/cinetix/app/
+│           ├── MainActivity.kt, CinetixApp.kt
+│           ├── data/         → CinetixRepository, SessionManager (simpan token & alamat server)
+│           │   └── remote/   → ApiService, ApiClient (Retrofit), Dto
+│           ├── ui/           → layar-layar:
+│           │   ├── auth/       login & daftar
+│           │   ├── home/       film, bioskop
+│           │   ├── booking/    jadwal, denah kursi, pembayaran
+│           │   ├── tiket/      riwayat & e-ticket
+│           │   ├── admin/      CRUD dan laporan
+│           │   ├── profil/, components/, theme/
+│           │   └── AppNavigation.kt
+│           └── util/         → barcode, cetak tiket, format, poster
+│
+├── backend/                  ← REST API Kotlin (tanpa framework besar)
 │   ├── src/main/kotlin/
-│   │   ├── model/               # entity + abstract class + interface (OOP)
-│   │   ├── repository/          # akses MySQL (JDBC)
-│   │   ├── service/             # logika bisnis
-│   │   ├── exception/           # custom exception
-│   │   ├── util/                # koneksi DB, QR/barcode, hash password
-│   │   ├── api/                 # router + endpoint REST
-│   │   └── Main.kt
-│   ├── src/test/kotlin/         # unit test (repository palsu, tanpa MySQL)
-│   ├── build.gradle.kts
-│   └── Dockerfile
-├── android/                     # aplikasi Android (Kotlin + Jetpack Compose)
-│   └── app/src/main/java/com/cinetix/app/
-│       ├── data/                # Retrofit, DTO, session
-│       ├── ui/                  # layar: auth, home, booking, tiket, profil, admin
-│       └── util/                # format rupiah, QR/barcode, cetak tiket
-├── data/schema.sql, seed.sql    # skema & data awal MySQL
-├── docs/                        # user story, class diagram, API, pembagian tugas
-├── docker-compose.yml           # MySQL + backend
-└── .github/workflows/ci.yml     # unit test + build APK otomatis
+│   │   ├── Main.kt           titik mulai
+│   │   ├── api/              Router, Routes (daftar endpoint), Dto
+│   │   ├── service/          logika bisnis (Booking, Pembayaran, Jadwal, Auth, Laporan, dll.)
+│   │   ├── repository/       akses MySQL lewat JDBC
+│   │   ├── model/            Studio, Pembayaran, Pengguna, Diskon, Entitas
+│   │   ├── exception/        error khusus (kursi sudah dipesan, dll.)
+│   │   └── util/             Database, PasswordHasher, BarcodeGenerator, PosterStorage, dll.
+│   ├── src/main/resources/web/   ← versi web: index.html, style.css, app.js
+│   ├── src/test/kotlin/      41 unit test (pakai repository palsu, tanpa MySQL)
+│   ├── Dockerfile
+│   └── build.gradle.kts, gradlew
+│
+├── data/
+│   ├── schema.sql            11 tabel
+│   └── seed.sql              data awal (kota, bioskop, film, akun demo)
+│
+├── docs/                     user story, class diagram, dokumentasi API, pembagian tugas
+├── docker-compose.yml        menjalankan MySQL + backend sekaligus
+├── .github/workflows/ci.yml  jalankan test dan build APK otomatis di GitHub
+└── README.md
 ```
 
 Aplikasi Android **tidak** terhubung langsung ke MySQL. Semua logika bisnis dan akses database berada di backend.
