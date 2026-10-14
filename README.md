@@ -122,9 +122,6 @@ cd backend
 ```
 39 unit test menguji model dan service memakai repository palsu, tanpa MySQL. GitHub Actions menjalankannya otomatis setiap push.
 
-## Screenshot
-<img src="docs/screenshot.png" width="500">
-
 ## Teknologi
 - Kotlin (OOP)
 - Gradle
