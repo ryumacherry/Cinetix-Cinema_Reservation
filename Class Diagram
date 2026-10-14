@@ -1,0 +1,190 @@
+## Class diagram domain (model/)
+```mermaid
+classDiagram
+    direction TB
+    class Studio {
+        <<abstract>>
+        +id: Int
+        +nama: String
+        +kapasitas: Int
+        +ruang: String
+        #hargaDasar: Double
+        +kursiPerBaris: Int
+        +deskripsiPengalaman() String
+        +hargaTiket(akhirPekan: Boolean) Double
+        +bonus(jumlahTiket: Int) String
+        +semuaKursi() List~String~
+        +validasiDenah()
+    }
+    class Reguler {
+        +jenisLayar: String
+    }
+    class FourDX {
+        +efek: Set~String~
+        +nonaktifkanEfek(efek) Set~String~
+    }
+    class Premiere {
+        +voucherSnackPerTiket: Int
+        +hitungVoucher(n) Int
+    }
+    class Suites {
+        -pesananLayanan: List~String~
+        +pesanLayananKursi(item)
+    }
+    Studio <|-- Reguler
+    Studio <|-- FourDX
+    Studio <|-- Premiere
+    Studio <|-- Suites
+
+    class Pembayaran {
+        <<abstract>>
+        +nominal: Double
+        +status: StatusBayar
+        +metode: String
+        +kode: String
+        +biayaAdmin() Double
+        +totalBayar() Double
+        +proses() Boolean
+        +bayar() Boolean
+    }
+    class Qris {
+        +payload() String
+    }
+    class TransferBank {
+        +bank: String
+        +nomorVirtualAccount(ref) String
+    }
+    class KartuKredit {
+        -noKartu: String
+        +nomorTersamar() String
+    }
+    Pembayaran <|-- Qris
+    Pembayaran <|-- TransferBank
+    Pembayaran <|-- KartuKredit
+
+    class Cashback {
+        <<interface>>
+        +keterangan: String
+        +hitung(total, metode) Double
+    }
+    class CashbackQris
+    class PromoCashback {
+        +persen
+        +maks
+        +minTransaksi
+        +aktif
+    }
+    Cashback <|.. CashbackQris
+    Cashback <|.. PromoCashback
+
+
+    class Pengguna {
+        <<abstract>>
+        +id +nama +email
+        +peran: Peran
+        +bolehAksesAdmin() Boolean
+    }
+    class Pelanggan {
+        +saldoCashback: Double  [private set]
+        +tambahCashback(nilai)
+    }
+    class Admin
+    Pengguna <|-- Pelanggan
+    Pengguna <|-- Admin
+
+    class Cetakable {
+        <<interface>>
+        +isiBarcode() String
+        +cetak() String
+    }
+    class Tiket {
+        <<data>>
+        +kodeTiket
+        +judulFilm
+        +kursi
+    }
+    Cetakable <|.. Tiket
+
+    class StudioFactory {
+        <<object>>
+        +buat(tipe, id, kapasitas, ruang, harga) Studio
+    }
+    class PembayaranFactory {
+        <<object>>
+        +buat(kode, nominal, bank, noKartu) Pembayaran
+    }
+    StudioFactory ..> Studio
+    PembayaranFactory ..> Pembayaran
+```
+
+## Class diagram service & repository
+```mermaid
+classDiagram
+    direction LR
+    class CrudRepository~T~ {
+        <<interface>>
+        +semua() List~T~
+        +cari(id) T
+        +tambah(item) Int
+        +ubah(id, item)
+        +hapus(id)
+    }
+    class JadwalRepository {
+        <<interface>>
+        +cariJadwal(filter)
+        +kursiTerisi(jadwalId)
+    }
+    class BookingRepository {
+        <<interface>>
+        +simpanBaru(data) Int
+        +tandaiLunas()
+        +batalkan()
+        +laporan()
+    }
+    CrudRepository <|-- JadwalRepository
+    JadwalRepository <|.. JdbcJadwalRepository
+    BookingRepository <|.. JdbcBookingRepository
+    JadwalRepository <|.. FakeJadwalRepository : unit test
+    BookingRepository <|.. FakeBookingRepository : unit test
+
+    class JadwalService {
+        +tanggalTersedia()
+        +validasiTanggal()
+        +cariTersedia()
+        +denahKursi()
+        +generateOtomatis()
+    }
+    class BookingService {
+        +buat()
+        +detail()
+        +batal()
+        +bersihkanKedaluwarsa()
+    }
+    class PembayaranService {
+        +mulai()
+        +konfirmasi()
+    }
+    class AuthService {
+        +daftar()
+        +login()
+        +dariToken()
+    }
+    class AdminService {
+        +entitas(nama) SumberDayaAdmin
+        +hargaStudio()
+        +ubahHarga()
+    }
+    class SumberDayaAdmin~T~ {
+        +daftar()
+        +tambah(json)
+        +ubah(id, json)
+        +hapus(id)
+    }
+
+    JadwalService --> JadwalRepository
+    BookingService --> JadwalService
+    BookingService --> BookingRepository
+    PembayaranService --> BookingService
+    AdminService --> SumberDayaAdmin
+    SumberDayaAdmin --> CrudRepository
+```
