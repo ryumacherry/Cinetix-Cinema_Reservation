@@ -1,0 +1,42 @@
+# Menjalankan MySQL + backend API dengan satu perintah:
+#   docker compose up -d --build
+# Aplikasi Android (emulator) mengakses API di http://10.0.2.2:8080/
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rahasia123
+      MYSQL_DATABASE: cinetix
+      TZ: Asia/Jakarta
+    ports:
+      - "3307:3306"        # opsional, untuk cek pakai DBeaver/Workbench (port 3307 agar tidak bentrok MySQL lokal)
+    volumes:
+      - dbdata:/var/lib/mysql
+      - ./data/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql
+      - ./data/seed.sql:/docker-entrypoint-initdb.d/02-seed.sql
+    healthcheck:
+      # 127.0.0.1 (TCP) memastikan MySQL benar-benar siap, bukan server sementara saat inisialisasi
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-prahasia123"]
+      interval: 5s
+      retries: 20
+
+  api:
+    build: ./backend
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:mysql://db:3306/cinetix?useSSL=false&allowPublicKeyRetrieval=true
+      DB_USER: root
+      DB_PASS: rahasia123
+      TZ: Asia/Jakarta
+      OUTPUT_DIR: /app/output
+      UPLOAD_DIR: /app/uploads
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./output:/app/output   # e-ticket (.txt) dan barcode (.png) muncul di folder host
+      - ./uploads:/app/uploads # poster film yang diunggah admin (tetap ada walau container dibuat ulang)
+
+volumes:
+  dbdata:
