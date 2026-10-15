@@ -1,0 +1,14 @@
+========================================
+            E-TICKET CINETIX
+========================================
+Kode     : CTX-261015-000004-RGHQ
+Pemesan  : Budi Santoso
+Film     : Agensi Rumah Tangga (R13)
+Bioskop  : Cinetix 23 Paskal
+Studio   : Studio 1 - Reguler
+Tanggal  : Kamis, 15 Oktober 2026
+Jam      : 16:00
+Kursi    : D5
+Bayar    : Rp50.000 via QRIS
+========================================
+Tunjukkan barcode ini di pintu studio.
