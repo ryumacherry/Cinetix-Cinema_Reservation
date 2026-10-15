@@ -1,0 +1,14 @@
+========================================
+            E-TICKET CINETIX
+========================================
+Kode     : CTX-261015-000005-HJ8K
+Pemesan  : Budi Santoso
+Film     : Ibu, Bagaimana Aku Tanpamu? (SU)
+Bioskop  : Cinetix 23 Paskal
+Studio   : Studio 1 - Reguler
+Tanggal  : Kamis, 15 Oktober 2026
+Jam      : 10:30
+Kursi    : C9
+Bayar    : Rp50.000 via QRIS
+========================================
+Tunjukkan barcode ini di pintu studio.
