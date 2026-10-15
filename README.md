@@ -1,7 +1,7 @@
 # Cinetix — Aplikasi Reservasi Bioskop
 
 ## Deskripsi
-Cinetix adalah aplikasi web pemesanan tiket bioskop. Aplikasi ini menyelesaikan masalah pelanggan yang
+Cinetix adalah aplikasi web untuk melakukan pemesanan tiket bioskop. Aplikasi ini menyelesaikan masalah pelanggan yang
 harus datang ke loket atau memilih kursi tanpa melihat denah studio, serta risiko dua orang memesan kursi
 yang sama. Pelanggan dapat melihat bioskop per kota, memilih jadwal dan kursi dari denah, membayar, lalu
 menyimpan e-ticket ber-barcode. Admin bioskop dapat mengelola data dan melihat laporan penjualan.
