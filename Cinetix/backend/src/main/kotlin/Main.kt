@@ -36,7 +36,7 @@ fun main() {
     println("=== CINETIX API ===")
     Database.tungguSiap()
 
-    // 1. Repository (akses MySQL lewat JDBC)
+    // 1. Repository (mengakses MySQL lewat JDBC)
     val kotaRepo = JdbcKotaRepository()
     val cinemaRepo = JdbcCinemaRepository()
     val filmRepo = JdbcFilmRepository()
