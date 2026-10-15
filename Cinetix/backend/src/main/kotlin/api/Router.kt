@@ -79,7 +79,7 @@ class Konteks(
 
 typealias Handler = (Konteks) -> Unit
 
-/** Router mini di atas com.sun.net.httpserver (bawaan JDK) — tanpa framework tambahan. */
+/** Router mini di atas com.sun.net.httpserver (bawaan JDK) — tidak ada framework tambahan. */
 class Router(private val auth: AuthService) {
 
     private class Rute(val metode: String, val pola: Regex, val namaParam: List<String>, val akses: Akses, val handler: Handler)
