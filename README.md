@@ -25,12 +25,12 @@ menyimpan e-ticket ber-barcode. Admin bioskop dapat mengelola data dan melihat l
 - [x] Film Sedang Tayang dan Coming Soon, beserta detail film
 - [x] Pilih jadwal (maksimal 3 hari ke depan), lokasi, jam, dan tipe studio (Reguler / Premiere / Suites)
 - [x] Pilih kursi dari denah studio (section dekat/jauh layar, jalan tengah, anti double booking)
-- [x] Diskon beli minimal 5 tiket (Reguler 6%, Premiere 8%, Suites 10%)
+- [x] Diskon ketika pembelian mencapai 5 tiket (Reguler 6%, Premiere 8%, Suites 10%)
 - [x] Pembayaran QRIS, transfer bank (virtual account), dan kartu kredit (simulasi)
 - [x] Riwayat pembelian pelanggan
 - [x] E-ticket dengan barcode, bisa dicetak atau disimpan sebagai PDF
 - [x] Admin: CRUD film, kota, cinema, studio (denah kursi dibuat otomatis), dan jadwal
-- [x] Admin: ubah harga studio dan unggah poster film
+- [x] Admin: ubah harga tiket dan unggah poster film
 - [x] Admin: laporan penjualan dan film terlaris
 
 ## Arsitektur
@@ -100,6 +100,28 @@ classDiagram
 Diagram lengkap (termasuk ERD): [`docs/02-class-diagram.md`](docs/02-class-diagram.md).
 Dokumentasi REST API: [`docs/03-api.md`](docs/03-api.md).
 
+## Struktur folder
+```
+cinetix/
+├── backend/                       # REST API Kotlin + penyaji versi web
+│   ├── src/main/kotlin/
+│   │   ├── model/                 # entity + abstract class + interface (OOP)
+│   │   ├── repository/            # akses MySQL (JDBC), termasuk tabel kursi
+│   │   ├── service/               # logika bisnis
+│   │   ├── exception/             # custom exception
+│   │   ├── util/                  # koneksi DB, QR/barcode, hash password
+│   │   ├── api/                   # router + endpoint REST
+│   │   └── Main.kt
+│   ├── src/main/resources/web/    # VERSI WEB: index.html, style.css, app.js
+│   ├── src/test/kotlin/           # unit test (repository palsu, tanpa MySQL)
+│   ├── build.gradle.kts
+│   └── Dockerfile
+├── data/schema.sql, seed.sql      # skema & data awal MySQL (11 tabel)
+├── docs/                          # user story, class diagram, API, pembagian tugas
+├── docker-compose.yml             # MySQL + backend
+└── .github/workflows/ci.yml       # unit test otomatis
+```
+
 ## Cara Menjalankan
 ### Lokal
 Butuh JDK 17 dan MySQL 8.
@@ -148,7 +170,7 @@ tanpa MySQL.
 
 ## Screenshot
 <!-- Simpan tangkapan layar aplikasi di docs/screenshot.png -->
-<img src="docs/screenshot.png" width="500">
+<img src="Downloads/cinetix.png" width="500">
 
 ## Teknologi
 - Kotlin 2.0.21 (JVM 17)
