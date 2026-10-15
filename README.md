@@ -1,10 +1,13 @@
 # Cinetix — Aplikasi Reservasi Bioskop
 
 ## Deskripsi
-Cinetix adalah aplikasi pemesanan tiket bioskop untuk pelanggan yang ingin memesan tiket tanpa antre, dan untuk admin bioskop yang perlu mengelola data serta memantau penjualan. Pelanggan dapat melihat bioskop per kota, film Sedang Tayang & Coming Soon, memilih jadwal (maks. 3 hari ke depan) dan studio (Reguler / Premiere / Suites), memilih kursi tanpa risiko double booking, membayar, mendapat diskon, lalu menyimpan e-ticket ber-barcode.
+Cinetix adalah aplikasi web pemesanan tiket bioskop. Aplikasi ini menyelesaikan masalah pelanggan yang
+harus datang ke loket atau memilih kursi tanpa melihat denah studio, serta risiko dua orang memesan kursi
+yang sama. Pelanggan dapat melihat bioskop per kota, memilih jadwal dan kursi dari denah, membayar, lalu
+menyimpan e-ticket ber-barcode. Admin bioskop dapat mengelola data dan melihat laporan penjualan.
 
 > ⚠️ **Pembayaran QRIS, transfer bank, dan kartu kredit adalah SIMULASI.**
-> Tidak terhubung ke payment gateway. QR berisi nominal dibuat dengan ZXing, lalu pelanggan menekan "Saya sudah bayar" untuk mensimulasikan pembayaran berhasil.
+> Tidak terhubung ke payment gateway. Pelanggan menekan "Saya sudah bayar" untuk mensimulasikan pembayaran berhasil.
 
 ## Anggota Kelompok
 | Nama | NIM | Peran |
@@ -16,152 +19,148 @@ Cinetix adalah aplikasi pemesanan tiket bioskop untuk pelanggan yang ingin memes
 | Renisa Rahmawati | 225443025 | QA + Data |
 | Nabila Khalishah | 225443021 | DevOps |
 
-Rincian kontribusi ada di [CONTRIBUTORS.md](CONTRIBUTORS.md).
-
 ## Fitur
-**Pelanggan**
-- [x] Daftar & login
-- [x] Lihat bioskop per kota
-- [x] Film Sedang Tayang & Coming Soon + detail film
-- [x] Pilih hari (maks. 3 hari), lokasi, jam, dan studio
-- [x] Pilih kursi (dari denah studio (dibagi seksi dekat/jauh layar dan dua sisi dengan jalan tengah, anti double booking)
-- [x] Bayar QRIS (QR otomatis sesuai nominal) / Transfer Bank (VA) / Kartu Kredit
-- [x] diskon beli banyak (Reguler 6% · Premiere 8% · Suites 10% untuk 5 tiket atau lebih) 
-- [x] Riwayat pembelian
-- [x] E-ticket + barcode untuk dicetak
+- [x] Daftar dan login (pelanggan dan admin)
+- [x] Bioskop per kota
+- [x] Film Sedang Tayang dan Coming Soon, beserta detail film
+- [x] Pilih jadwal (maksimal 3 hari ke depan), lokasi, jam, dan tipe studio (Reguler / Premiere / Suites)
+- [x] Pilih kursi dari denah studio (section dekat/jauh layar, jalan tengah, anti double booking)
+- [x] Diskon beli minimal 5 tiket (Reguler 6%, Premiere 8%, Suites 10%)
+- [x] Pembayaran QRIS, transfer bank (virtual account), dan kartu kredit (simulasi)
+- [x] Riwayat pembelian pelanggan
+- [x] E-ticket dengan barcode, bisa dicetak atau disimpan sebagai PDF
+- [x] Admin: CRUD film, kota, cinema, studio (denah kursi dibuat otomatis), dan jadwal
+- [x] Admin: ubah harga studio dan unggah poster film
+- [x] Admin: laporan penjualan dan film terlaris
 
-**Admin**
-- [x] CRUD film, kota, cinema, studio, jadwal, harga studio
-- [x] Laporan penjualan & film terlaris
+## Arsitektur
+Web hanya berbicara dengan backend lewat HTTP/JSON. Hanya backend yang mengakses MySQL.
 
-## Struktur Folder
-```
-cinetix/
-├── android/                  ← Aplikasi Android (Kotlin + Jetpack Compose)
-│   └── app/src/main/
-│       ├── AndroidManifest.xml
-│       ├── res/              (ikon, warna, tema, string)
-│       └── java/com/cinetix/app/
-│           ├── MainActivity.kt, CinetixApp.kt
-│           ├── data/         → CinetixRepository, SessionManager (simpan token & alamat server)
-│           │   └── remote/   → ApiService, ApiClient (Retrofit), Dto
-│           ├── ui/           → layar-layar:
-│           │   ├── auth/       login & daftar
-│           │   ├── home/       film, bioskop
-│           │   ├── booking/    jadwal, denah kursi, pembayaran
-│           │   ├── tiket/      riwayat & e-ticket
-│           │   ├── admin/      CRUD dan laporan
-│           │   ├── profil/, components/, theme/
-│           │   └── AppNavigation.kt
-│           └── util/         → barcode, cetak tiket, format, poster
-│
-├── backend/                  ← REST API Kotlin (tanpa framework besar)
-│   ├── src/main/kotlin/
-│   │   ├── Main.kt           titik mulai
-│   │   ├── api/              Router, Routes (daftar endpoint), Dto
-│   │   ├── service/          logika bisnis (Booking, Pembayaran, Jadwal, Auth, Laporan, dll.)
-│   │   ├── repository/       akses MySQL lewat JDBC
-│   │   ├── model/            Studio, Pembayaran, Pengguna, Diskon, Entitas
-│   │   ├── exception/        error khusus (kursi sudah dipesan, dll.)
-│   │   └── util/             Database, PasswordHasher, BarcodeGenerator, PosterStorage, dll.
-│   ├── src/main/resources/web/   ← versi web: index.html, style.css, app.js
-│   ├── src/test/kotlin/      41 unit test (pakai repository palsu, tanpa MySQL)
-│   ├── Dockerfile
-│   └── build.gradle.kts, gradlew
-│
-├── data/
-│   ├── schema.sql            11 tabel
-│   └── seed.sql              data awal (kota, bioskop, film, akun demo)
-│
-├── docs/                     user story, class diagram, dokumentasi API, pembagian tugas
-├── docker-compose.yml        menjalankan MySQL + backend sekaligus
-├── .github/workflows/ci.yml  jalankan test dan build APK otomatis di GitHub
-└── README.md
+```mermaid
+flowchart LR
+    W["Versi web<br/>HTML/CSS/JS"] -- "HTTP/JSON" --> B["Backend API<br/>Kotlin OOP"]
+    B -- "JDBC" --> C[("MySQL 8")]
+    subgraph Backend
+      direction TB
+      R["api/ (Router + Routes)"] --> S["service/ (logika bisnis)"]
+      S --> P["repository/ (JDBC)"]
+      S --> M["model/ (OOP)"]
+    end
 ```
 
-Aplikasi Android **tidak** terhubung langsung ke MySQL. Semua logika bisnis dan akses database berada di backend.
+Class diagram domain (`model/`):
 
-Diagram lengkap (class diagram & ERD): [docs/02-class-diagram.md](docs/02-class-diagram.md)
+```mermaid
+classDiagram
+    direction TB
+    class Diskon {
+        <<interface>>
+        +persenDiskon: Double
+        +hitungDiskon(jumlahTiket, subtotal) Double
+    }
+    class Studio {
+        <<abstract>>
+        +kursiPerBaris: Int
+        +hargaTiket(akhirPekan) Double
+        +buatDenah() List~KursiDenah~
+    }
+    class Reguler
+    class Premiere
+    class Suites
+    Diskon <|.. Studio
+    Studio <|-- Reguler
+    Studio <|-- Premiere
+    Studio <|-- Suites
 
-## Konsep OOP
-| Konsep | Penerapan |
-|---|---|
-| Abstract class | `Studio`, `Pembayaran`, `Pengguna` |
-| Inheritance | `Reguler/Premiere/Suites`, `Qris/TransferBank/KartuKredit`, `Pelanggan/Admin` |
-| Polymorphism | `studio.hargaTiket()`, `studio.persenDiskon`, `pembayaran.biayaAdmin()` & `proses()` |
-| Interface | `Cetakable`, `CrudRepository<T>` dan repository lain |
-| Encapsulation | status bayar hanya berubah lewat `bayar()`; `pesananLayanan` Suites `private` |
-| Data class | `Film`, `Cinema`, `Jadwal`, `KursiStudio`, `Kursi`, `Tiket` |
-| Custom exception | `KursiSudahDipesanException`, `HariTidakValidException`, `PembayaranGagalException` |
+    class Pembayaran {
+        <<abstract>>
+        +nominal: Double
+        +biayaAdmin() Double
+        +proses()
+    }
+    class Qris
+    class TransferBank
+    class KartuKredit
+    Pembayaran <|-- Qris
+    Pembayaran <|-- TransferBank
+    Pembayaran <|-- KartuKredit
 
-Diagram lengkap: [`docs/02-class-diagram.md`](docs/02-class-diagram.md).
+    class Pengguna {
+        <<abstract>>
+        +id: Int
+        +nama: String
+        +email: String
+    }
+    class Pelanggan
+    class Admin
+    Pengguna <|-- Pelanggan
+    Pengguna <|-- Admin
+```
+
+Diagram lengkap (termasuk ERD): [`docs/02-class-diagram.md`](docs/02-class-diagram.md).
+Dokumentasi REST API: [`docs/03-api.md`](docs/03-api.md).
 
 ## Cara Menjalankan
-
 ### Lokal
-Butuh JDK 17+ dan MySQL 8.
+Butuh JDK 17 dan MySQL 8.
 ```bash
 mysql -u root -p < data/schema.sql
-mysql -u root -p tiketku < data/seed.sql
+mysql -u root -p cinetix < data/seed.sql
 
 cd backend
 # Linux/Mac
-DB_URL="jdbc:mysql://localhost:3306/tiketku?useSSL=false&allowPublicKeyRetrieval=true" DB_USER=root DB_PASS=passwordmu ./gradlew run --console=plain
+DB_URL="jdbc:mysql://localhost:3306/cinetix?useSSL=false&allowPublicKeyRetrieval=true" DB_USER=root DB_PASS=passwordmu ./gradlew run --console=plain
 # Windows (PowerShell)
-$env:DB_URL="jdbc:mysql://localhost:3306/tiketku?useSSL=false&allowPublicKeyRetrieval=true"; $env:DB_USER="root"; $env:DB_PASS="passwordmu"; .\gradlew.bat run --console=plain
+$env:DB_URL="jdbc:mysql://localhost:3306/cinetix?useSSL=false&allowPublicKeyRetrieval=true"; $env:DB_USER="root"; $env:DB_PASS="passwordmu"; .\gradlew.bat run --console=plain
 ```
+Lalu buka http://localhost:8080/ di browser.
 
 ### Docker
 Butuh Docker Desktop.
 ```bash
-docker compose up -d --build      # MySQL + backend API
-docker compose logs -f api        # tunggu sampai muncul "[OK] TIKETKU API berjalan"
+docker compose build
+docker compose run --rm --service-ports api
 ```
-Cek di browser: http://localhost:8080/api → `{"status":"OK"}`.
-Reset database: `docker compose down -v` lalu `docker compose up -d --build`.
+Atau jalankan di background: `docker compose up -d --build` (cek dengan `docker compose logs -f api`,
+tunggu sampai muncul `[OK] CINETIX API berjalan`).
 
-### Aplikasi Android
-1. Buka folder `android/` di **Android Studio** (Ladybug atau lebih baru), tunggu Gradle sync selesai.
-2. Pastikan backend sudah berjalan.
-3. **Emulator:** langsung Run ▶ (memakai `http://10.0.2.2:8080/`).
-4. **HP asli:** satu Wi-Fi dengan laptop, lalu di layar login tekan ikon ⚙️ dan isi `http://<IP-laptop>:8080/`.
+Buka http://localhost:8080/ di browser. Cek API di http://localhost:8080/api (hasil `{"status":"OK"}`).
 
-### Akun Demo
+Akun demo:
+
 | Peran | Email | Password |
 |---|---|---|
 | Pelanggan | `budi@mail.com` | `budi123` |
-| Admin | `admin@tiketku.id` | `admin123` |
+| Admin | `admin@cinetix.id` | `admin123` |
 
 Kartu kredit uji (simulasi): `4111 1111 1111 1111`.
+
+Reset database (misalnya setelah mengubah `seed.sql`): `docker compose down -v`, lalu jalankan lagi.
 
 ### Menjalankan Test
 ```bash
 cd backend
 ./gradlew test
 ```
-39 unit test menguji model dan service memakai repository palsu, tanpa MySQL. GitHub Actions menjalankannya otomatis setiap push.
+41 unit test menguji model (harga dan denah tiap studio, diskon 6/8/10%, pembayaran) dan service
+(validasi 3 hari, denah per section, double booking + rollback, alur pembayaran) memakai repository palsu,
+tanpa MySQL.
+
+## Screenshot
+<!-- Simpan tangkapan layar aplikasi di docs/screenshot.png -->
+<img src="docs/screenshot.png" width="500">
 
 ## Teknologi
-- Kotlin (OOP)
-- Gradle
-- Android Jetpack Compose + Retrofit
-- MySQL 8 + JDBC
-- Gson, ZXing (QR & barcode)
+- Kotlin 2.0.21 (JVM 17)
+- Gradle 8.10.2 (wrapper)
+- HttpServer bawaan JDK (tanpa framework web)
+- MySQL 8 dan JDBC (mysql-connector-j 8.4.0)
+- Gson 2.11.0 (JSON)
+- ZXing 3.5.3 (QR dan barcode)
+- HTML, CSS, JavaScript (tampilan web)
 - JUnit 5
-- Docker, GitHub Actions
+- Docker dan Docker Compose
+- GitHub Actions
 
-## Masalah yang sering terjadi
-| Masalah | Solusi |
-|---|---|
-| Android: "Tidak bisa terhubung ke server" | Backend belum jalan, atau alamat server salah. Emulator: `http://10.0.2.2:8080/`. HP asli: IP laptop + satu Wi-Fi |
-| `Public Key Retrieval is not allowed` | Tambahkan `allowPublicKeyRetrieval=true&useSSL=false` di `DB_URL` |
-| `Connection refused` di Docker | Di dalam container, host database adalah `db`, bukan `localhost` |
-| Seed/schema tidak berubah (mis. tabel `kursi_studio` tidak ada) | Script init MySQL hanya jalan sekali. Jalankan `docker compose down -v` lalu `docker compose up -d --build` |
-| Port 3306 bentrok | MySQL Docker dipetakan ke port host `3307` |
-| Jadwal kosong | Backend mengisi jadwal 3 hari otomatis saat start. Admin juga bisa tekan "Generate 3 hari" |
-
-## Dokumentasi
-- [User story & requirement](docs/01-user-story.md)
-- [Class diagram, ERD, arsitektur](docs/02-class-diagram.md)
-- [Dokumentasi REST API](docs/03-api.md)
-- [Pembagian tugas & alur 3 hari](docs/04-pembagian-tugas.md)
+## Lisensi
+MIT
