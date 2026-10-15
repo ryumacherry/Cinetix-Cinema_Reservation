@@ -37,6 +37,7 @@ services:
     volumes:
       - ./output:/app/output   # e-ticket (.txt) dan barcode (.png) muncul di folder host
       - ./uploads:/app/uploads # poster film yang diunggah admin (tetap ada walau container dibuat ulang)
+      - ./data/posters:/app/data/posters
 
 volumes:
   dbdata:
