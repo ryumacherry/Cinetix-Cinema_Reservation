@@ -2,7 +2,6 @@ package model
 
 enum class Peran { PELANGGAN, ADMIN }
 
-/** ABSTRACT CLASS: Pelanggan dan Admin punya hak akses berbeda. */
 abstract class Pengguna(val id: Int, val nama: String, val email: String) {
     abstract val peran: Peran
     abstract fun bolehAksesAdmin(): Boolean

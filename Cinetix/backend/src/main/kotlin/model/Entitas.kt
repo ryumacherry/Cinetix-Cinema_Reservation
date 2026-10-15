@@ -7,11 +7,6 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 
-// =====================================================================
-// DATA CLASS: entitas sederhana yang hanya membawa data.
-// Field "...Nama" yang nullable diisi saat SELECT (hasil JOIN), bukan disimpan.
-// =====================================================================
-
 data class Kota(val id: Int = 0, val nama: String)
 
 data class Cinema(
@@ -43,7 +38,6 @@ data class Film(
     val posterUrl: String? = null
 )
 
-/** Baris tabel studio (untuk CRUD). Objek OOP-nya dibuat lewat StudioFactory. */
 data class StudioData(
     val id: Int = 0,
     val cinemaId: Int,
@@ -69,18 +63,12 @@ data class Jadwal(
     val terisi: Int = 0
 )
 
-/** Status satu kursi pada jadwal tertentu (untuk layar pilih kursi). */
-data class Kursi(val id: Int, val kode: String, val nomor: Int, val terisi: Boolean)
-
-enum class StatusBooking { PENDING, LUNAS, BATAL }
-
-/** Data yang disimpan saat booking baru dibuat (status PENDING). */
 data class BookingBaru(
     val penggunaId: Int,
     val jadwalId: Int,
-    val kursi: List<KursiDenah>,     // kursi dari tabel `kursi`
-    val subtotalTiket: Double,       // harga tiket x jumlah kursi
-    val diskon: Double               // diskon >= 5 tiket
+    val kursi: List<KursiDenah>,    
+    val subtotalTiket: Double,       
+    val diskon: Double               
 )
 
 data class BookingDetail(
@@ -100,16 +88,12 @@ data class BookingDetail(
     val dibuat: LocalDateTime,
     val dibayar: LocalDateTime?,
     val sisaDetikBayar: Long = 0,
-    val bonus: String? = null,       // diisi service (bonus khas studio)
-    val teksTiket: String? = null    // diisi service saat LUNAS (hasil Cetakable.cetak())
+    val bonus: String? = null,      
+    val teksTiket: String? = null    
 ) {
-    /** Nominal sebelum biaya admin = subtotal tiket - diskon. */
     val nominal get() = subtotalTiket - diskon
 }
 
-// =====================================================================
-// INTERFACE Cetakable: semua yang bisa dicetak sebagai e-ticket/barcode.
-// =====================================================================
 interface Cetakable {
     fun isiBarcode(): String
     fun cetak(): String
@@ -177,9 +161,6 @@ data class Tiket(
     }
 }
 
-// =====================================================================
-// Laporan admin
-// =====================================================================
 data class PeringkatFilm(val judul: String, val tiket: Int, val pendapatan: Double)
 data class RingkasanMetode(val metode: String, val transaksi: Int, val total: Double)
 

@@ -4,16 +4,10 @@ import exception.ValidasiException
 
 enum class StatusBayar { MENUNGGU, BERHASIL, GAGAL }
 
-/**
- * ABSTRACT CLASS + ENCAPSULATION.
- * [status] hanya bisa diubah lewat fungsi [bayar], tidak bisa di-set dari luar.
- * Catatan: semua metode adalah SIMULASI (tidak terhubung payment gateway sungguhan).
- */
 abstract class Pembayaran(val nominal: Double) {
-    abstract val metode: String          // label untuk ditampilkan, contoh "Transfer BCA"
+    abstract val metode: String       
     abstract val kode: String            // QRIS / BANK / KREDIT
 
-    /** true = pelanggan harus menekan "Saya sudah bayar" (QRIS/Transfer). */
     open val butuhKonfirmasi: Boolean = true
 
     var status: StatusBayar = StatusBayar.MENUNGGU
@@ -41,7 +35,6 @@ class Qris(nominal: Double, private val referensi: String = System.currentTimeMi
     override val metode = "QRIS"
     override val kode = "QRIS"
 
-    // payload memuat nominal, lalu di-render jadi gambar QR (library ZXing) di server
     fun payload() = "CINETIX-QRIS|NOMINAL=${totalBayar().toLong()}|REF=$referensi"
 
     override fun proses() = true
@@ -74,7 +67,7 @@ class TransferBank(nominal: Double, val bank: String) : Pembayaran(nominal) {
 class KartuKredit(nominal: Double, private val noKartu: String) : Pembayaran(nominal) {
     override val metode = "Kartu Kredit"
     override val kode = "KREDIT"
-    override val butuhKonfirmasi = false      // langsung diproses
+    override val butuhKonfirmasi = false     
 
     override fun biayaAdmin() = Math.round(nominal * 0.02).toDouble()
 
@@ -96,7 +89,6 @@ class KartuKredit(nominal: Double, private val noKartu: String) : Pembayaran(nom
     }
 }
 
-/** FACTORY: memilih subclass Pembayaran sesuai pilihan pelanggan. */
 object PembayaranFactory {
     fun buat(kode: String?, nominal: Double, bank: String? = null, noKartu: String? = null): Pembayaran =
         when (kode?.uppercase()) {

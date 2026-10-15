@@ -2,7 +2,6 @@ package model
 
 import exception.ValidasiException
 
-/** Tipe studio. Nilai [kodeDb] sama persis dengan ENUM di tabel studio. */
 enum class TipeStudio(val kodeDb: String, val label: String) {
     REGULER("REGULER", "Reguler"),
     PREMIERE("PREMIERE", "Premiere"),
@@ -15,16 +14,13 @@ enum class TipeStudio(val kodeDb: String, val label: String) {
     }
 }
 
-/** Section denah: dekat layar (depan) atau jauh dari layar (belakang). */
 enum class Section(val label: String) {
     DEPAN("Dekat layar"),
     BELAKANG("Jauh dari layar")
 }
 
-/** Sisi kursi terhadap jalan tengah. */
 enum class Sisi { KIRI, KANAN }
 
-/** Satu kursi pada denah studio = satu baris tabel `kursi`. */
 data class KursiDenah(
     val id: Int = 0,
     val studioId: Int,
@@ -35,15 +31,11 @@ data class KursiDenah(
     val sisi: String        // KIRI / KANAN
 )
 
-/**
- * ABSTRACT CLASS + POLYMORPHISM + INTERFACE.
- * Setiap turunan menentukan harga dasar, kursi per baris, persen diskon, dan deskripsi pengalaman.
- */
 abstract class Studio(
     val id: Int,
-    val nama: String,          // nama tipe, contoh "Reguler"
+    val nama: String,         
     val kapasitas: Int,
-    val ruang: String          // nama ruangan, contoh "Studio 1"
+    val ruang: String          
 ) : Diskon {
     abstract val tipe: TipeStudio
     protected abstract val hargaDasar: Double
@@ -51,24 +43,16 @@ abstract class Studio(
 
     abstract fun deskripsiPengalaman(): String
 
-    /** Bonus khas studio (dipakai di e-ticket). Default: tidak ada. */
     open fun bonus(jumlahTiket: Int): String? = null
 
     open fun hargaTiket(akhirPekan: Boolean) =
         if (akhirPekan) hargaDasar + BIAYA_AKHIR_PEKAN else hargaDasar
 
-    /** Diskon hanya jika membeli minimal 5 tiket; persennya berbeda per tipe studio. */
     override fun hitungDiskon(jumlahTiket: Int, subtotal: Double): Double =
         if (jumlahTiket >= Diskon.MIN_TIKET) Math.round(subtotal * persenDiskon / 100.0).toDouble() else 0.0
 
     fun jumlahBaris(): Int = (kapasitas + kursiPerBaris - 1) / kursiPerBaris
 
-    /**
-     * Membuat denah lengkap untuk disimpan di tabel `kursi`:
-     * - baris A, B, C, ... dan nomor 1..kursiPerBaris
-     * - setengah baris pertama = section DEPAN (dekat layar), sisanya BELAKANG (jauh dari layar)
-     * - setengah nomor pertama di KIRI jalan tengah, sisanya di KANAN
-     */
     fun buatDenah(): List<KursiDenah> {
         val barisDepan = jumlahBaris() / 2
         return (0 until kapasitas).map { i ->
@@ -113,7 +97,7 @@ class Reguler(
     val jenisLayar: String = "2D"
 ) : Studio(id, "Reguler", kapasitas, ruang) {
     override val tipe = TipeStudio.REGULER
-    override val kursiPerBaris = 10          // 5 kiri | jalan tengah | 5 kanan
+    override val kursiPerBaris = 10         
     override val persenDiskon = 6.0
     override fun deskripsiPengalaman() = "Layar $jenisLayar, kursi standar"
 }
@@ -125,7 +109,7 @@ class Premiere(
     override val hargaDasar: Double = 90_000.0
 ) : Studio(id, "Premiere", kapasitas, ruang) {
     override val tipe = TipeStudio.PREMIERE
-    override val kursiPerBaris = 8           // 4 kiri | jalan tengah | 4 kanan
+    override val kursiPerBaris = 8           
     override val persenDiskon = 8.0
 
     override fun deskripsiPengalaman() = "Kursi recliner yang nyaman dan memanjakan"
@@ -138,9 +122,9 @@ class Suites(
     override val hargaDasar: Double = 150_000.0
 ) : Studio(id, "Suites", kapasitas, ruang) {
     override val tipe = TipeStudio.SUITES
-    override val kursiPerBaris = 6           // 3 kiri | jalan tengah | 3 kanan
+    override val kursiPerBaris = 6          
     override val persenDiskon = 10.0
-    private val pesananLayanan = mutableListOf<String>()     // atribut khas (ENCAPSULATION)
+    private val pesananLayanan = mutableListOf<String>()     
 
     fun pesanLayananKursi(item: String) { pesananLayanan.add(item) }
     fun daftarLayanan(): List<String> = pesananLayanan.toList()
@@ -150,7 +134,6 @@ class Suites(
     override fun deskripsiPengalaman() = "Suite privat, kursi bed + layanan pelayan pribadi"
 }
 
-/** FACTORY: membuat objek Studio yang tepat dari data database. */
 object StudioFactory {
     fun buat(
         tipe: TipeStudio,
