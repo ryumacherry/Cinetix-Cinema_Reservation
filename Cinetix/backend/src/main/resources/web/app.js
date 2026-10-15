@@ -1,19 +1,16 @@
 'use strict';
 /*
- * CINETIX versi web
  * Satu halaman (SPA) tanpa framework, memakai REST API backend Kotlin.
  * Disajikan langsung oleh backend Kotlin: buka http://localhost:8080/ di browser.
  */
 
-// =====================================================================
 // Sesi & state
-// =====================================================================
 const simpan = {
   get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } },
   set(k, v) { try { if (v == null) localStorage.removeItem(k); else localStorage.setItem(k, v); } catch (e) { /* abaikan */ } }
 };
 
-// Sesi login disimpan di sessionStorage: otomatis hilang saat tab/jendela ditutup (reload tetap login).
+// Sesi login disimpan di sessionStorage
 // Pilihan kota tetap di localStorage karena hanya preferensi.
 const sesi = {
   get(k) { try { return sessionStorage.getItem(k); } catch (e) { return null; } },
@@ -40,9 +37,7 @@ function simpanSesi(token, pengguna) {
   sesi.set('cinetix_pengguna', pengguna ? JSON.stringify(pengguna) : null);
 }
 
-// =====================================================================
 // Pemanggil REST API
-// =====================================================================
 async function api(path, opsi = {}) {
   const headers = { 'Content-Type': 'application/json' };
   if (S.token) headers.Authorization = 'Bearer ' + S.token;
@@ -67,7 +62,7 @@ async function api(path, opsi = {}) {
   return data;
 }
 
-/** Mengunggah file mentah (bukan JSON), dipakai untuk poster film. */
+/** Mengunggah file mentah, dipakai untuk poster film. */
 async function apiUnggah(path, berkas) {
   const headers = { 'Content-Type': berkas.type || 'application/octet-stream' };
   if (S.token) headers.Authorization = 'Bearer ' + S.token;
@@ -82,7 +77,7 @@ async function apiUnggah(path, berkas) {
   return data;
 }
 
-/** Memperkecil gambar pilihan admin (sisi terpanjang maks 1280 px) lalu menjadikannya JPEG, supaya jauh di bawah batas 3 MB. */
+/** Memperkecil gambar pilihan admin (sisi terpanjang maks 1280 px) lalu menjadikannya JPEG. */
 function kecilkanGambar(file, sisiMaks = 1280) {
   return new Promise((ok, gagal) => {
     const url = URL.createObjectURL(file);
@@ -94,7 +89,7 @@ function kecilkanGambar(file, sisiMaks = 1280) {
       c.width = Math.max(1, Math.round(img.width * skala));
       c.height = Math.max(1, Math.round(img.height * skala));
       const g = c.getContext('2d');
-      g.fillStyle = '#fff';                       // PNG transparan tidak menjadi hitam
+      g.fillStyle = '#fff';                       
       g.fillRect(0, 0, c.width, c.height);
       g.drawImage(img, 0, 0, c.width, c.height);
       c.toBlob(b => (b ? ok(b) : gagal(new Error('Gambar tidak bisa diproses.'))), 'image/jpeg', 0.85);
@@ -104,9 +99,7 @@ function kecilkanGambar(file, sisiMaks = 1280) {
   });
 }
 
-// =====================================================================
 // Helper tampilan
-// =====================================================================
 const $ = (sel, el = document) => el.querySelector(sel);
 const $$ = (sel, el = document) => Array.from(el.querySelectorAll(sel));
 
@@ -128,17 +121,12 @@ function urutKursi(list) { return list.slice().sort((a, b) => a[0].localeCompare
 
 const PALET = [['#c62828', '#4a148c'], ['#1565c0', '#004d40'], ['#ef6c00', '#b71c1c'], ['#2e7d32', '#1b5e20'],
   ['#6a1b9a', '#283593'], ['#37474f', '#111111'], ['#ad1457', '#4e342e']];
-/**
- * Poster film. Jika admin sudah mengunggah gambar, `url` = lokasi file di server sendiri (mis. /uploads/posters/film-3-17.jpg).
- * Jika belum ada / gagal dimuat, yang tampil poster pengganti (gradasi warna + inisial judul).
- */
+
 function poster(judul, id, besar, url) {
   const [a, b] = PALET[id % PALET.length];
   const inisial = judul.split(' ').filter(Boolean)
     .slice(0, 2).map(k => k[0].toUpperCase()).join('');
 
-  // Nama file lama seperti "poster_1.jpg" diarahkan ke folder uploads/posters.
-  // URL upload yang sudah lengkap tetap digunakan apa adanya.
   const urlPoster = url
     ? (url.startsWith('/uploads/posters/')
         ? url
@@ -195,9 +183,7 @@ function bukaModal(judul, isiForm, onSimpan) {
 }
 function tutupModal() { const m = $('#modal'); m.hidden = true; m.innerHTML = ''; }
 
-// =====================================================================
 // Header & router
-// =====================================================================
 function renderHeader() {
   const nav = $('#nav');
   const kw = $('#kota-wrap');
@@ -255,9 +241,7 @@ async function jalankan() {
   }
 }
 
-// =====================================================================
 // Halaman: login & daftar
-// =====================================================================
 async function halLogin() {
   tampil(`<div class="auth"><div class="logo-besar">CX</div><h1>Cinetix</h1><p class="redup">Pesan tiket bioskop lebih cepat</p>
     <form id="f-login" class="kartu form">
@@ -305,9 +289,7 @@ async function halDaftar() {
   };
 }
 
-// =====================================================================
 // Halaman: film
-// =====================================================================
 async function halFilm() {
   const [tayang, segera] = await Promise.all([api('/api/film?status=NOW_PLAYING'), api('/api/film?status=COMING_SOON')]);
   const kartu = f => `<a class="kartu-film" href="#/film/${f.id}">${poster(f.judul, f.id, false, f.posterUrl)}<div class="isi">
@@ -340,9 +322,7 @@ async function halFilmDetail(id) {
     </div></div>`);
 }
 
-// =====================================================================
 // Jadwal (dipakai halaman jadwal film & detail bioskop)
-// =====================================================================
 function htmlStudio(list) {
   const j0 = list[0];
   const jam = list.slice().sort((a, b) => a.jam.localeCompare(b.jam)).map(j => j.sisaKursi > 0
@@ -390,9 +370,7 @@ async function halJadwal(filmId) {
   await pasangJadwal(tanggal, `filmId=${filmId}&kotaId=${S.kotaId}`, j => j.cinemaNama);
 }
 
-// =====================================================================
 // Halaman: bioskop
-// =====================================================================
 async function halBioskop() {
   const list = await api('/api/cinema?kotaId=' + S.kotaId);
   tampil('<h1>Bioskop</h1>' + (list.length
@@ -408,9 +386,7 @@ async function halBioskopDetail(id) {
   await pasangJadwal(tanggal, `cinemaId=${id}`, j => j.filmJudul);
 }
 
-// =====================================================================
 // Halaman: pilih kursi (denah dari tabel `kursi`)
-// =====================================================================
 const IKON_LAYAR = '<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2"/><path d="M8 20h8M12 16v4"/></svg>';
 
 async function halKursi(jadwalId) {
@@ -493,9 +469,7 @@ async function halKursi(jadwalId) {
   perbarui();
 }
 
-// =====================================================================
 // Halaman: pembayaran (simulasi)
-// =====================================================================
 function htmlRingkasan(b) {
   const j = b.jadwal;
   return `<div class="kartu"><h3>${esc(j.filmJudul)}</h3>
@@ -584,9 +558,7 @@ function tampilInstruksi(b, i) {
   $('#ganti').onclick = () => formMetode(b);
 }
 
-// =====================================================================
 // Halaman: e-ticket & riwayat
-// =====================================================================
 const NAMA_STATUS = { LUNAS: 'Lunas', PENDING: 'Menunggu bayar', BATAL: 'Dibatalkan' };
 const labelStatus = s => `<span class="status ${s.toLowerCase()}">${NAMA_STATUS[s] || esc(s)}</span>`;
 
@@ -653,9 +625,7 @@ async function halProfil() {
   };
 }
 
-// =====================================================================
 // Halaman admin: laporan, CRUD generik, harga studio
-// =====================================================================
 const ENTITAS = {
   film: {
     judul: 'Film',
@@ -775,7 +745,7 @@ async function adminCrud(tab, kunci) {
     bukaModal((awal ? 'Ubah ' : 'Tambah ') + e.judul, e.fields.map(f => inputField(f, awal, opsiRelasi)).join(''), async fm => {
     const body = {};
     e.fields.forEach(([k, , jenis]) => {
-      if (jenis === 'gambar') return;               // poster dikirim terpisah (bukan bagian JSON)
+      if (jenis === 'gambar') return;               
       const v = nilai(fm, k).trim();
       if (v !== '') body[k] = ['angka', 'relasi'].includes(jenis) ? Number(v) : v;
     });
@@ -827,8 +797,6 @@ async function adminCrud(tab, kunci) {
 
 // =====================================================================
 window.addEventListener('hashchange', jalankan);
-// Saat halaman dibuka: kalau ada sesi di tab ini, pastikan tokennya masih berlaku di server.
-// Jika tidak (misalnya backend di-restart), api() otomatis membersihkan sesi dan kembali ke login.
 async function mulai() {
   if (S.token) {
     try { simpanSesi(S.token, await api('/api/me')); } catch (e) { /* sesi tidak berlaku -> login */ }
