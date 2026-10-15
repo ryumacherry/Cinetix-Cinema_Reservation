@@ -16,7 +16,7 @@ dependencies {
     implementation("com.google.code.gson:gson:2.11.0")          // JSON
     implementation("com.mysql:mysql-connector-j:8.4.0")         // driver JDBC MySQL
     implementation("com.google.zxing:core:3.5.3")               // QR & barcode
-    implementation("com.google.zxing:javase:3.5.3")             // simpan QR/barcode ke PNG
+    implementation("com.google.zxing:javase:3.5.3")             // menyimpan QR/barcode ke PNG
 
     testImplementation(kotlin("test"))
     testImplementation("org.junit.jupiter:junit-jupiter:5.10.2")
