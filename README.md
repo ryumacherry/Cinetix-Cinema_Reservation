@@ -170,7 +170,7 @@ tanpa MySQL.
 
 ## Screenshot
 <!-- Simpan tangkapan layar aplikasi di docs/screenshot.png -->
-<img src="Downloads/cinetix.png" width="500">
+<img src="docs/cinetix.png" width="500">
 
 ## Teknologi
 - Kotlin 2.0.21 (JVM 17)
