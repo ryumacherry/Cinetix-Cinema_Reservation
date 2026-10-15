@@ -18,7 +18,7 @@ import util.PosterStorage
 import java.time.LocalDate
 import java.time.format.DateTimeParseException
 
-/** Wadah semua service (dependency container sederhana). */
+/** Wadah untuk semua service (dependency container sederhana). */
 class Layanan(
     val auth: AuthService,
     val katalog: KatalogService,
