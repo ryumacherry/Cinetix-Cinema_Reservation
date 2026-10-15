@@ -2,7 +2,7 @@ package api
 
 import model.Pengguna
 
-// Semua field request nullable + default, supaya JSON yang tidak lengkap
+// Semua field request nullable + default
 // menghasilkan pesan validasi yang jelas (bukan NullPointerException).
 
 data class DaftarRequest(val nama: String? = null, val email: String? = null, val password: String? = null)
