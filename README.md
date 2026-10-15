@@ -15,7 +15,7 @@ menyimpan e-ticket ber-barcode. Admin bioskop dapat mengelola data dan melihat l
 | Qurrata A'yuni | 225443023 | Project Lead |
 | Ajeng Az Zahra | 225443002 | Domain Developer |
 | Arlisya Rahwitami | 225443004 | Business Logic |
-| Shiva Nayla Zahra | 225443053 | UI (Android) |
+| Shiva Nayla Zahra | 225443053 | UI (Website) |
 | Renisa Rahmawati | 225443025 | QA + Data |
 | Nabila Khalishah | 225443021 | DevOps |
 
