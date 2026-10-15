@@ -1,4 +1,4 @@
-# Menjalankan MySQL + backend API dengan satu perintah:
+# Menjalankan MySQL + backend API hanya dengan satu perintah:
 #   docker compose up -d --build
 # Setelah jalan, buka http://localhost:8080/ di browser
 services:
