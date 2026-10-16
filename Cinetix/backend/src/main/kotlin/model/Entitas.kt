@@ -63,6 +63,10 @@ data class Jadwal(
     val terisi: Int = 0
 )
 
+data class Kursi(val id: Int, val kode: String, val nomor: Int, val terisi: Boolean)
+
+enum class StatusBooking { PENDING, LUNAS, BATAL }
+
 data class BookingBaru(
     val penggunaId: Int,
     val jadwalId: Int,
